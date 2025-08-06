@@ -1,3 +1,3 @@
-module github.com/ahobsonsayers/goworker
+module github.com/ahobsonsayers/gorker
 
-go 1.23.2
+go 1.24

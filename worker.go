@@ -8,17 +8,21 @@ import (
 	"time"
 )
 
-var ErrRunning = errors.New("service already running")
-
-type Config struct{}
+type Config struct {
+	PollingPeriod time.Duration
+}
 
 func (c *Config) Validate() error { //nolint:revive,unparam // we are using placeholders
+	if c.PollingPeriod <= 0 {
+		return errors.New("polling period must be a valid positive duration")
+	}
+
 	return nil
 }
 
 type Result struct{}
 
-type Service struct {
+type Worker struct {
 	config Config
 
 	// Result Channels
@@ -32,32 +36,39 @@ type Service struct {
 	cancel  context.CancelFunc
 }
 
-func (s *Service) Results() <-chan Result { return s.resultChan }
-func (s *Service) Errors() <-chan error   { return s.errorChan }
+func (s *Worker) Results() <-chan Result { return s.resultChan }
+func (s *Worker) Errors() <-chan error   { return s.errorChan }
 
-func (s *Service) IsRunning() bool {
+func (s *Worker) IsRunning() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.cancel != nil
 }
 
-func (s *Service) WaitUntilStarted() { s.startWg.Wait() }
-func (s *Service) WaitUntilStopped() { s.stopWg.Wait() }
+func (s *Worker) WaitUntilStarted() { s.startWg.Wait() }
+func (s *Worker) WaitUntilStopped() { s.stopWg.Wait() }
 
 // setup can be used to add custom setup logic to the worker
-func (s *Service) setup(ctx context.Context) error { //nolint:revive,unparam // we are using placeholders
+func (s *Worker) setup(ctx context.Context) error { //nolint:revive,unparam // we are using placeholders
+	fmt.Println("setup")
+	return nil
+}
+
+// process is your workers main process
+func (s *Worker) process(ctx context.Context) error { //nolint:revive,unparam // we are using placeholders
+	fmt.Println("process")
 	return nil
 }
 
 // Start the worker.
 // This will block until the worker stopped.
-func (s *Service) Start(ctx context.Context) error {
+func (s *Worker) Start(ctx context.Context) error {
 	s.mu.Lock()
 
 	// Check if already running
 	if s.cancel != nil {
 		s.mu.Unlock()
-		return ErrRunning
+		return errors.New("worker already running")
 	}
 
 	// Run setup
@@ -67,7 +78,7 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("setup failed: %w", err)
 	}
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(s.config.PollingPeriod)
 	defer ticker.Stop()
 
 	// Start worker go routine
@@ -102,14 +113,14 @@ func (s *Service) Start(ctx context.Context) error {
 
 // Stop the worker.
 // This will block until worker is fully stopped.
-func (s *Service) Stop() {
+func (s *Worker) Stop() {
 	s.mu.Lock()
 	s.cancel()
 	s.mu.Unlock()
 	s.stopWg.Wait()
 }
 
-func NewWorker(config Config) (*Service, error) {
+func NewWorker(config Config) (*Worker, error) {
 	err := config.Validate()
 	if err != nil {
 		return nil, err
@@ -118,7 +129,7 @@ func NewWorker(config Config) (*Service, error) {
 	var startWg sync.WaitGroup
 	startWg.Add(1)
 
-	return &Service{
+	return &Worker{
 		config: config,
 		// Result Channels
 		resultChan: make(chan Result),
