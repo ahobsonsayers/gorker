@@ -11,7 +11,9 @@ import (
 
 func main() {
 	// Create worker
-	worker, err := NewWorker(Config{})
+	worker, err := NewWorker(Config{
+		PollingPeriod: time.Second,
+	})
 	if err != nil {
 		log.Fatalf("failed to create worker: %v", err)
 	}

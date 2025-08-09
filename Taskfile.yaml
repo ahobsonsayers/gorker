@@ -2,18 +2,34 @@
 version: "3"
 
 tasks:
-  lint:
-    cmds:
-      - golangci-lint run
-
   format:
     cmds:
-      - go fmt ./...
+      - go tool gofumpt -l -w .
+
+  lint:
+    cmds:
+      - go tool golangci-lint run .
+
+  test:
+    cmds:
+      - go test ./...
 
   build:
     cmds:
       - go build -v -o ./bin/ .
 
+  build:docker:
+    cmds:
+      - docker build . -t arranhs/gorker
+
   run:
     cmds:
       - go run .
+
+  run:docker:
+    deps: [build:docker]
+    cmds:
+      - |
+        docker run --rm \
+          --name gorker \
+          -t arranhs/gorker
