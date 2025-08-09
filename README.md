@@ -1,4 +1,4 @@
-# gorker - a go worker
+# gorker - boilerplate for go workers
 
 This package contains an incredible simply example of a go worker that runs in a goroutine, with proper synchronisation.
 
