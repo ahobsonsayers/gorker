@@ -1,0 +1,55 @@
+name: Lint and Test
+
+on:
+  # Manual Invocation
+  workflow_dispatch:
+
+  # Invocation from workflow
+  workflow_call:
+
+env:
+  CI: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run lint
+        uses: golangci/golangci-lint-action@v8
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Setup task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run test
+        run: task test

@@ -1,0 +1,21 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint-test:
+    name: Lint and Test
+    uses: ./.github/workflows/lint-test.yaml
+    secrets: inherit
+
+  build-push:
+    name: Build and Push
+    uses: ./.github/workflows/build-push.yaml
+    needs: [lint-test]
+    secrets: inherit
+    with:
+      ref: ${{ github.sha }}
+      tags: develop,${{ github.sha }}
