@@ -18,9 +18,14 @@ func main() {
 		log.Fatalf("failed to create worker: %v", err)
 	}
 
-	// Setup watching for exit signal
+	// Setup signal handling
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(
+		signalChan,
+		syscall.SIGINT,  // Interrupt (Ctrl+C)
+		syscall.SIGTERM, // Termination request
+		syscall.SIGQUIT, // Quit (Ctrl+\)
+	)
 	go func() {
 		<-signalChan
 		worker.Stop()
@@ -39,7 +44,9 @@ func main() {
 		}
 	}()
 
-	// Wait for worker to started and the stopped
+	// Wait for worker to start
 	worker.WaitUntilStarted()
+
+	// Wait for worker to stop
 	worker.WaitUntilStopped()
 }
