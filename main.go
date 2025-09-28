@@ -44,8 +44,7 @@ func main() {
 		}
 	}()
 
-	// Wait for worker to start
-	worker.WaitUntilStarted()
+	time.Sleep(time.Millisecond)
 
 	// Wait for worker to stop
 	worker.WaitUntilStopped()
