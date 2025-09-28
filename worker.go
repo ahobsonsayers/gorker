@@ -47,6 +47,7 @@ type Worker struct {
 	runningWg    sync.WaitGroup
 	shutdownOnce sync.Once
 
+	// Cancellation
 	cancel context.CancelFunc
 }
 
