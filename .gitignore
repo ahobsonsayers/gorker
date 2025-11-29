@@ -28,9 +28,9 @@ bin/
 scratch/
 
 # Ignore certain files
+*.DS_Store
 .~lock*
 .env
 .secrets
-*.DS_Store
-*debug_bin*
+*.secrets
 scratch*

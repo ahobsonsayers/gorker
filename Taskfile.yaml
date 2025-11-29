@@ -8,11 +8,22 @@ tasks:
 
   lint:
     cmds:
-      - go tool golangci-lint run .
+      - go tool golangci-lint run --fix ./...
+
+  generate:
+    aliases:
+      - gen
+    cmds:
+      - go generate ./...
 
   test:
     cmds:
       - go test ./...
+
+  test:clean:
+    cmds:
+      - go clean -testcache
+      - task: test
 
   build:
     cmds:
@@ -20,7 +31,7 @@ tasks:
 
   build:docker:
     cmds:
-      - docker build . -t arranhs/gorker
+      - docker build . --tag gorker
 
   run:
     cmds:
@@ -32,4 +43,4 @@ tasks:
       - |
         docker run --rm \
           --name gorker \
-          -t arranhs/gorker
+          gorker
