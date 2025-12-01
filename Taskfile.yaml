@@ -29,15 +29,15 @@ tasks:
     cmds:
       - go build -v -o ./bin/ .
 
-  build:docker:
-    cmds:
-      - docker build . --tag gorker
-
   run:
     cmds:
       - go run .
 
-  run:docker:
+  docker:docker:
+    cmds:
+      - docker build . --tag gorker
+
+  docker:run:
     deps: [build:docker]
     cmds:
       - |
