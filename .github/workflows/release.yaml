@@ -8,6 +8,7 @@ on:
         type: string
         required: true
         default: main
+
       default-bump:
         description: Default Version Bump (if none found in commit messages)
         type: choice

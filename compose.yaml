@@ -1,0 +1,8 @@
+services:
+  gorker:
+    container_name: gorker
+    image: arranhs/gorker:latest
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: unless-stopped
