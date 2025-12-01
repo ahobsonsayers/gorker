@@ -33,12 +33,12 @@ tasks:
     cmds:
       - go run .
 
-  docker:docker:
+  docker:build:
     cmds:
       - docker build . --tag gorker
 
   docker:run:
-    deps: [build:docker]
+    deps: [docker:build]
     cmds:
       - |
         docker run --rm \
